@@ -6,6 +6,9 @@
 #include <filesystem>
 #include <windows.h>
 #include "rp1210_defs.h"
+#include "dla_info.h"
+#include "can_frame.h"
+#include "array_to_types.h"
 
 enum class STATUS : int
 {
@@ -20,9 +23,18 @@ enum class STATUS : int
 class DLAdapterRP1210
 {
 public:
-    DLAdapterRP1210();
+    DLAdapterRP1210(DlaInfo& dla_info);
     RP1210_VERSION GetSupportedVersion(){return rp1210_version_;}
-
+    bool DestroyConnection();
+    bool Connect();
+    bool Disconnect();
+    void UnloadDll();
+    bool ReadCANMesg(CanFrame& frame);
+    bool SendCANMesg( CanFrame& frame);
+    std::string GetErrorMesg(){return error_mesg_;}
+    bool SetFilter(const CAN_MESG_LEN can_mesg_len, const uint32_t mask, const uint32_t header);
+    bool SetMesgIdFilter(uint32_t mesg_id);
+    bool Configure();
 
 private:
     short RP1210ClientConnect(HWND hwnd_handle, short device_id, const char* fpch_protocol, long tx_buf_size, long rx_buf_size, short app_packet_sizing_incoming_msgs);
@@ -42,6 +54,15 @@ private:
     std::function<T> LoadDllFunc(const std::string& function_name, bool& found);
     bool LoadDllFile(std::filesystem::path dll_filepath);
     bool LoadMinConfig();
+    void ActualVersion();
+    bool ConvertRecvBuffToStruct(CanFrame& frame, short mesg_size);
+    bool BuffToJ1939(CanFrame& frame, short mesg_size);
+    bool BuffToCan(CanFrame& frame, short mesg_size);
+    void J1939ToBuff(CanFrame& frame, short& bytes_to_send);
+    void CanToBuff(CanFrame& frame, short& bytes_to_send);
+    bool ClearAllFilters();
+    bool SetProtocolFilters();
+
 
     HINSTANCE dll_;
 
@@ -60,7 +81,14 @@ private:
 
     STATUS status_ = STATUS::UNCONFIGURED;
     std::string error_mesg_;
+    short client_id_;
+    bool echo_enabled_ = false;
     RP1210_VERSION rp1210_version_ = RP1210_VERSION::NONE;
+    uint32_t dll_function_flags_ = 0;
+    DlaInfo dla_info_;
+    PROTOCOL protocol_ = PROTOCOL::CAN;
+    unsigned char recv_buff_[1796]{ 0 };
+    unsigned char send_buff_[1796]{ 0 };
 };
 template <typename T>
 struct TypeParser {};

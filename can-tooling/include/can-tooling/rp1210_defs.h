@@ -115,17 +115,17 @@ enum class PROTOCOL : uint8_t
 
 enum class RP1210_DLL_FUNCTIONS : uint32_t
 {
-    CLIENT_CONNECT = 1,
-    CLIENT_DISCONNECT = 2,
-    READ_MESSAGE = 4,
-    SEND_MESSAGE = 8,
-    SEND_COMMAND = 16,
-    READ_VERSION = 32,
-    GET_ERROR_MESSAGE = 64,
-    READ_DETAILED_VERSION = 128,
-    GET_LAST_ERROR_MESSAGE = 256,
-    GET_HARDWARE_STATUS = 512,
-    IOCTRL = 1024
+    CLIENT_CONNECT = 1,         //all
+    CLIENT_DISCONNECT = 2,      //all
+    READ_MESSAGE = 4,           //all
+    SEND_MESSAGE = 8,           //all
+    SEND_COMMAND = 16,          //all
+    READ_VERSION = 32,          //all
+    GET_ERROR_MESSAGE = 64,     //all
+    READ_DETAILED_VERSION = 128, //c only
+    GET_LAST_ERROR_MESSAGE = 256,   //b & c
+    GET_HARDWARE_STATUS = 512, //all
+    IOCTRL = 1024 // b and later
 };
 
 enum class RP1210_VERSION
@@ -137,10 +137,16 @@ enum class RP1210_VERSION
     RP1210C
 };
 
+enum class CAN_MESG_LEN : uint8_t
+{
+    STANDARD_CAN = 0,
+    EXTENDED_CAN = 1
+};
+
 const uint32_t RP1210_MINIMUM_VERSION_MASK = 31;
-const uint32_t RP1210_VERSION_A_MASK = 0;
-const uint32_t RP1210_VERSION_B_MASK = 0;
-const uint32_t RP1210_VERSION_C_MASK = 0;
+const uint32_t RP1210_VERSION_A_MASK = 575;//needs to be checked
+const uint32_t RP1210_VERSION_B_MASK = 1919;
+const uint32_t RP1210_VERSION_C_MASK = 2047;
 
 
 #endif // RP1210_DEFS_H
