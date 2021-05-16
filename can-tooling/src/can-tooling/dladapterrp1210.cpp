@@ -650,15 +650,16 @@ void DLAdapterRP1210::UnloadDll()
 bool DLAdapterRP1210::ReadCANMesg(CanFrame &frame)
 {
     short ret_val = RP1210ReadMessage(client_id_, (char*)&recv_buff_, 1796, static_cast<short>(RP1210_BLOCKING_MODE::NON_BLOCKING_IO));
-        if ((ret_val == 0) || (ret_val > 127))
-        {
-            return false;
-        }
-        if (!ConvertRecvBuffToStruct(frame, ret_val))
-        {
-            return false;
-        }
-        return true;
+    if ((ret_val == 0) || (ret_val > 127))
+    {
+        frame.error = false; // set false as this branch indicates RP1210 connection or configuration not related to a received frame
+        return false;
+    }
+    if (!ConvertRecvBuffToStruct(frame, ret_val))
+    {
+        return false;
+    }
+    return true;
 }
 
 bool DLAdapterRP1210::SendCANMesg(CanFrame &frame)

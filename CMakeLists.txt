@@ -7,3 +7,5 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project("can-tools")
 
 add_subdirectory("can-tooling")
+
+add_subdirectory("test_app")

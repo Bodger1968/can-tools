@@ -1,22 +1,24 @@
-#pragma once
+#ifndef MESG_FIFO_H
+#define MESG_FIFO_H
+#include <mutex>
 #include <condition_variable>
 #include <queue>
-#include <mutex>
 #include <memory>
+
 
 template <typename T>
 class MesgFifo
 {
 public:
-	explicit MesgFifo() {};
-	~MesgFifo() {};
+    explicit MesgFifo() {}
+    ~MesgFifo() {}
 	explicit MesgFifo(const MesgFifo& other)
 	{
 		std::lock_guard lock(mutex_);
 		fifo_ = other.fifo_;
 	}
 
-	void Push(T value)
+    void Push(T& value)
 	{
 		std::lock_guard lock(mutex_);
 		fifo_.push(value);
@@ -78,8 +80,10 @@ public:
 private:
 
 	std::queue<T> fifo_;
-	mutable std::mutex mutex_;
+    mutable std::mutex mutex_;
 	std::condition_variable condition_variable_;
+
 
 };
 
+#endif
